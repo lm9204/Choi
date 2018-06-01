@@ -60,7 +60,7 @@ app.get(['/topic', '/topic/:id'], (req, res) => {
                 topics      :rows,
                 title       :rows[req.params.id - 1]['title'],
                 description :rows[req.params.id - 1]['description'],
-                author      : rows[req.params.id - 1]['author'],
+                author      :rows[req.params.id - 1]['author'],
                 id          :req.params.id
              });
         }else {
@@ -96,9 +96,8 @@ app.post('/topic/:id/edit', (req, res) => {
     });
 });
 app.post('/topic/add', (req, res) => {
-    var sql = 'INSERT INTO topic (title, description, author) VALUES ( ?, ?, ?)';
-    var params = [ req.body.title, req.body.description, req.body.author];
-    connection.query(sql, params, (err, rows, fields) => {
+    var sql = 'INSERT INTO topic (title, description, author) VALUES (?, ?, ?)';
+    connection.query(sql, [ req.body.title, req.body.description, req.body.author], (err, rows, fields) => {
         if(err){
             console.log(err);
             res.status(500).send('Internal Server Error');
