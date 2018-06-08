@@ -1,14 +1,20 @@
 var express = require('express');
 var session = require('express-session');
 var parser  = require('body-parser');
-var FStore  = require('session-file-store')(session);
+var MySQLStore = require('express-mysql-session')(session);
 var app     = express();
 
 app.use(session({
     secret:'12354',
     resave:false,
     saveUninitialized: true,
-    store:new FStore()
+    store:new MySQLStore({
+        host    :'localhost',
+        port    :3306,
+        user    :'lm9204',
+        password:'',
+        database:'o2'
+    })
 }));
 app.use(parser.urlencoded({ extended: false }));
 
@@ -34,7 +40,9 @@ app.get('/welcome', (req, res) => {
 });
 app.get('/auth/logout', (req, res) => {
     delete req.session.display;
-    res.redirect('/welcome');
+    req.session.save( () => {
+        res.redirect('/welcome');
+    });
 });
 app.post('/auth/login', (req, res) => {
     var user = {
@@ -44,7 +52,9 @@ app.post('/auth/login', (req, res) => {
     };
     if(req.body.username === user.username && req.body.password === user.password){
         req.session.display = user.display;
-        res.redirect('/welcome');
+        req.session.save(() => {
+            res.redirect('/welcome');
+        });
     }else {
         res.send('Wrong Password or Username. <p><a href="/auth/login">login</a></p>');
     }
